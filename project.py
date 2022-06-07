@@ -112,6 +112,6 @@ class JPEG:
   
 
 if __name__ == "__main__":
-    img = JPEG('profile.jpg')
+    img = JPEG('photos/profile.jpg')
     img.decode()  
 

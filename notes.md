@@ -12,7 +12,7 @@ Most JPEG algorithm implementations use luminance and chrominance (YUV encoding)
 
 Y - brightness of the color \
 U - determine the color, amount of blue \
-V - determine the color, amount of red \
+V - determine the color, amount of red 
 
 #### JPEG encoding:
 - converts an image into chunks of 8x8 blocks of pixels called MCU
