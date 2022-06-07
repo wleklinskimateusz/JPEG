@@ -10,9 +10,9 @@ contains an APP14 marker segment
 
 Most JPEG algorithm implementations use luminance and chrominance (YUV encoding) instead of RGB because human eye is pretty bad at seeing high-frequency brightness changes over a small area.
 
-Y - brightness of the color
-U - determine the color, amount of blue
-V - determine the color, amount of red
+Y - brightness of the color \
+U - determine the color, amount of blue \
+V - determine the color, amount of red \
 
 #### JPEG encoding:
 - converts an image into chunks of 8x8 blocks of pixels called MCU
@@ -61,7 +61,7 @@ According to the standard, baseline will contain the series of 8x8 blocks right 
 -- 0xff, 0xc4 to identify DHT marker \
 -- 2 bytes 
 - Length \
--- This specifies the length of Huffman table \ 
+-- This specifies the length of Huffman table \
 -- 2 bytes
 - HT information \
 -- bit 0..3: number of HT (0..3, otherwise error) \
@@ -75,7 +75,7 @@ According to the standard, baseline will contain the series of 8x8 blocks right 
 - Symbols \
 -- Table containing the symbols in order of increasing code length \
 -- n = total number of codes \
--- n bytes \
+-- n bytes 
 
 
 
