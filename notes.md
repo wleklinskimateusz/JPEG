@@ -57,25 +57,25 @@ According to the standard, baseline will contain the series of 8x8 blocks right 
 ## Decoding procedure
 
 #### DHT section contents:
-- Marker Identifier
--- 0xff, 0xc4 to identify DHT marker
+- Marker Identifier \
+-- 0xff, 0xc4 to identify DHT marker \
+-- 2 bytes 
+- Length \
+-- This specifies the length of Huffman table \ 
 -- 2 bytes
-- Length
--- This specifies the length of Huffman table  
--- 2 bytes
-- HT information, 
--- bit 0..3: number of HT (0..3, otherwise error)
--- bit 4: type of HT, 0 = DC table, 1 = AC table
--- bit 5..7: not used, must be 0
+- HT information \
+-- bit 0..3: number of HT (0..3, otherwise error) \
+-- bit 4: type of HT, 0 = DC table, 1 = AC table \
+-- bit 5..7: not used, must be 0 \
 -- 1 byte
-- Number of Symbols
--- Number of symbols with codes of length 1..16
--- the sum(n) of these bytes is the total number of codes, which must be <= 256
+- Number of Symbols \
+-- Number of symbols with codes of length 1..16 \
+-- the sum(n) of these bytes is the total number of codes, which must be <= 256 \
 -- 16 bytes
-- Symbols
--- Table containing the symbols in order of increasing code length
--- n = total number of codes
--- n bytes
+- Symbols \
+-- Table containing the symbols in order of increasing code length \
+-- n = total number of codes \
+-- n bytes \
 
 
 
