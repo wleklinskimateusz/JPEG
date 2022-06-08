@@ -31,51 +31,37 @@ class Window(QMainWindow):
         b_size = mainMenu.addMenu("Brush Size")
         b_color = mainMenu.addMenu("Brush Color")
 
-        saveAction = QAction("Save", self)
-        saveAction.setShortcut("Ctrl + S")
-        fileMenu.addAction(saveAction)
-        saveAction.triggered.connect(self.save)
+        fileOptions = [
+            {"name": "Save", "command": self.save},
+            {"name": "Clear", "command": self.clear},
+        ]
+        for fileOption in fileOptions:
+            self.save_menu_action(**fileOption, menu=fileMenu)
 
-        clearAction = QAction("Clear", self)
-        clearAction.setShortcut("Ctrl + C")
-        fileMenu.addAction(clearAction)
-        clearAction.triggered.connect(self.clear)
+        sizes = [
+            {"name": "4px", "action": self.Pixel_4},
+            {"name": "7px", "action": self.Pixel_7},
+            {"name": "9px", "action": self.Pixel_9},
+            {"name": "12px", "action": self.Pixel_12},
+        ]
+        for size in sizes:
+            self.save_menu_action(size["name"], size["action"], b_size)
 
-        pix_4 = QAction("4px", self)
-        b_size.addAction(pix_4)
-        pix_4.triggered.connect(self.Pixel_4)
+        colors = [
+            {"name": "Black", "color": self.blackColor},
+            {"name": "White", "color": self.whiteColor},
+            {"name": "Green", "color": self.greenColor},
+            {"name": "Yellow", "color": self.yellowColor},
+            {"name": "Red", "color": self.redColor},
+        ]
 
-        pix_7 = QAction("7px", self)
-        b_size.addAction(pix_7)
-        pix_7.triggered.connect(self.Pixel_7)
+        for color in colors:
+            self.save_menu_action(color["name"], color["color"], b_color)
 
-        pix_9 = QAction("9px", self)
-        b_size.addAction(pix_9)
-        pix_9.triggered.connect(self.Pixel_9)
-
-        pix_12 = QAction("12px", self)
-        b_size.addAction(pix_12)
-        pix_12.triggered.connect(self.Pixel_12)
-
-        black = QAction("Black", self)
-        b_color.addAction(black)
-        black.triggered.connect(self.blackColor)
-
-        white = QAction("White", self)
-        b_color.addAction(white)
-        white.triggered.connect(self.whiteColor)
-
-        green = QAction("Green", self)
-        b_color.addAction(green)
-        green.triggered.connect(self.greenColor)
-
-        yellow = QAction("Yellow", self)
-        b_color.addAction(yellow)
-        yellow.triggered.connect(self.yellowColor)
-
-        red = QAction("Red", self)
-        b_color.addAction(red)
-        red.triggered.connect(self.redColor)
+    def save_menu_action(self, name: str, command, menu: QMenu):
+        action = QAction(name, self)
+        action.triggered.connect(command)
+        menu.addAction(action)
 
     def load_image_from_matrix(self, matrix: np.ndarray):
         """
@@ -91,17 +77,13 @@ class Window(QMainWindow):
                 self.image.setPixelColor(i, j, QColor(r, g, b))
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
-
         if event.button() == Qt.LeftButton:
             self.drawing = True
             self.lastPoint = event.pos()
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:
-
         if (event.buttons() & Qt.LeftButton) & self.drawing:
-
             painter = QPainter(self.image)
-
             painter.setPen(
                 QPen(
                     self.brushColor,
@@ -111,11 +93,8 @@ class Window(QMainWindow):
                     Qt.RoundJoin,
                 )
             )
-
             painter.drawLine(self.lastPoint, event.pos())
-
             self.lastPoint = event.pos()
-
             self.update()
 
     def mouseReleaseEvent(self, event: QMouseEvent) -> None:
