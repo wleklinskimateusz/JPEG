@@ -16,10 +16,6 @@ class Window(QMainWindow):
         self.image = QImage(self.size(), QImage.Format_RGB32)
         self.image.fill(Qt.white)
 
-        # Testing
-        black_box = np.zeros((200, 50, 3), dtype=np.uint8) * 255
-        self.load_image_from_matrix(black_box)
-
         self.drawing = False
         self.brushSize = 2
         self.brushColor = Qt.black
@@ -78,7 +74,7 @@ class Window(QMainWindow):
             for j in range(min(self.image.height(), matrix.shape[0])):
                 r, g, b = matrix[j, i]
                 self.image.setPixelColor(i, j, QColor(r, g, b))
-        self.update()
+            self.update()
 
     def save_image_to_matrix(self) -> np.ndarray:
         """
