@@ -9,7 +9,7 @@ from jpeg_handler import JPEG
 class Window(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Paint with PyQt5")
+        self.setWindowTitle("JPEG GUI")
         self.setGeometry(100, 100, 800, 600)
 
         # Image
@@ -74,7 +74,7 @@ class Window(QMainWindow):
             for j in range(min(self.image.height(), matrix.shape[0])):
                 r, g, b = matrix[j, i]
                 self.image.setPixelColor(i, j, QColor(r, g, b))
-            self.update()
+        self.update()
 
     def save_image_to_matrix(self) -> np.ndarray:
         """
