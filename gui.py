@@ -3,6 +3,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import numpy as np
 
+from jpeg_handler import JPEG
+
 
 class Window(QMainWindow):
     def __init__(self):
@@ -33,6 +35,7 @@ class Window(QMainWindow):
 
         fileOptions = [
             {"name": "Save", "command": self.save},
+            {"name": "Load", "command": self.load},
             {"name": "Clear", "command": self.clear},
         ]
         for fileOption in fileOptions:
@@ -71,10 +74,22 @@ class Window(QMainWindow):
 
         matrix must be NxMx3. (width, height, color ~ 0-255)
         """
-        for i in range(min(self.image.width(), matrix.shape[0])):
-            for j in range(min(self.image.height(), matrix.shape[1])):
-                r, g, b = matrix[i, j]
+        for i in range(min(self.image.width(), matrix.shape[1])):
+            for j in range(min(self.image.height(), matrix.shape[0])):
+                r, g, b = matrix[j, i]
                 self.image.setPixelColor(i, j, QColor(r, g, b))
+        self.update()
+
+    def save_image_to_matrix(self) -> np.ndarray:
+        """
+        Saves the image to a matrix.
+        :return: The image as a matrix.
+        """
+        matrix = np.zeros((self.image.height(), self.image.width(), 3), dtype=np.uint8)
+        for i in range(self.image.width()):
+            for j in range(self.image.height()):
+                matrix[j, i] = self.image.pixel(i, j)
+        return matrix
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         if event.button() == Qt.LeftButton:
@@ -107,17 +122,28 @@ class Window(QMainWindow):
 
     def save(self):
         filePath, _ = QFileDialog.getSaveFileName(
-            self, "Save Image", "", "PNG(*.png);;JPEG(*.jpg *.jpeg);;All Files(*.*) "
+            self, "Save Image", "", "JPEG(*.jpg *.jpeg)"
         )
 
         if filePath == "":
             return
-        self.image.save(filePath)
+        jpeg = JPEG()
+        jpeg.save(self.save_image_to_matrix(), filePath)
 
     def clear(self):
 
         self.image.fill(Qt.white)
         self.update()
+
+    def load(self):
+        filePath, _ = QFileDialog.getOpenFileName(
+            self, "Load Image", "", "JPEG(*.jpg *.jpeg)"
+        )
+
+        if filePath == "":
+            return
+        jpeg = JPEG()
+        self.load_image_from_matrix(jpeg.load(filePath))
 
     def Pixel_4(self):
         self.brushSize = 4
