@@ -119,7 +119,26 @@ class JPEG:
             if len(data)==0:
                 break       
 
+class Stream:
+    '''
+    class that will allow us to convert a 
+    string into bits and read the bits one by one.
+    '''
+    def __init__(self, data):
+        self.data= data
+        self.pos = 0
 
+    def GetBit(self):
+        b = self.data[self.pos >> 3]
+        s = 7-(self.pos & 0x7)
+        self.pos+=1
+        return (b >> s) & 1
+
+    def GetBitN(self, l):
+        val = 0
+        for i in range(l):
+            val = val*2 + self.GetBit()
+        return val
   
 
 if __name__ == "__main__":
