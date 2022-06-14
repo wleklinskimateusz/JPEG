@@ -31,6 +31,11 @@ class HuffmanTable:
         return False
     
     def GetHuffmanBits(self,  lengths, elements):
+        '''
+        Takes in the lengths and elements, iterates over all
+        the elements and puts them in a root list. This list 
+        contains nested lists and represents a binary tree.
+        '''                  
         self.elements = elements
         ii = 0
         for i in range(len(lengths)):
@@ -45,6 +50,12 @@ class HuffmanTable:
         return  r 
 
     def GetCode(self, st):
+        '''
+        method that traverses the tree for us and
+        gives us back the decoded bits using the
+        Huffman table. This method expects a 
+        bitstream as an input.
+        '''
         while(True):
             res = self.Find(st)
             if res == 0:
