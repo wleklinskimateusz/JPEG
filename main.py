@@ -1,8 +1,9 @@
-from gui import Window, QApplication
+# from gui import Window, QApplication
 import sys
-
 from struct import unpack
 import math
+import os
+from read_matrix_code import *
 
 marker_mapping = {
     0xFFD8: "Start of Image",
@@ -51,6 +52,8 @@ def DrawMatrix(x, y, matL, matCb, matCr):
     """
     Loops over a single 8x8 MCU and draws it on Tkinter canvas
     """
+ 
+    f = open("matrix_code.txt", "a")
     for yy in range(8):
         for xx in range(8):
             c = "#%02x%02x%02x" % ColorConversion(
@@ -58,8 +61,9 @@ def DrawMatrix(x, y, matL, matCb, matCr):
             )
             x1, y1 = (x * 8 + xx) * 2, (y * 8 + yy) * 2
             x2, y2 = (x * 8 + (xx + 1)) * 2, (y * 8 + (yy + 1)) * 2
+            f.write("{},{},{},{},{},{}".format(x1,y1,x2,y2,c,"\n"))
             w.create_rectangle(x1, y1, x2, y2, fill=c, outline=c)
-
+    f.close()
 
 def RemoveFF00(data):
     """
@@ -346,21 +350,23 @@ class JPEG:
                 break
 
 
-def main():
-    App = QApplication(sys.argv)
-    window = Window()
-    window.show()
-    sys.exit(App.exec_())
+# def main():
+#     App = QApplication(sys.argv)
+#     window = Window()
+#     window.show()
+#     sys.exit(App.exec_())
 
 
 if __name__ == "__main__":
     from tkinter import Tk, Canvas, mainloop
-
+    os.remove("matrix_code.txt")
     master = Tk()
     w = Canvas(master, width=1600, height=600)
     w.pack()
     # print(JPEG("profile.jpg"))
     img = JPEG("profile.jpg")
     img.decode()
-    mainloop()
+    image = decodeMatrix(800,800)
+    print(image)
+    # mainloop()
     # main()
