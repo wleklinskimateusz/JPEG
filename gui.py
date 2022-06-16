@@ -64,10 +64,14 @@ class Window(QMainWindow):
 
     def load_image_from_matrix(self, matrix: np.ndarray):
         """
-        Loads an image from a matrix.
-        :param matrix: The matrix to load the image from.
-        :return: None.
-        matrix must be NxMx3. (width, height, color ~ 0-255)
+                Loads an image from a matrix.
+                :param matrix: The matrix to load the image from.
+                :return: None.
+        <<<<<<< HEAD
+        =======
+
+        >>>>>>> master
+                matrix must be NxMx3. (width, height, color ~ 0-255)
         """
         for i in range(min(self.image.width(), matrix.shape[1])):
             for j in range(min(self.image.height(), matrix.shape[0])):
