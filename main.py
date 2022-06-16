@@ -16,7 +16,6 @@ marker_mapping = {
 }
 
 
-
 def PrintMatrix(m):
     """
     A convenience function for printing matrices
@@ -52,7 +51,7 @@ def DrawMatrix(x, y, matL, matCb, matCr):
     """
     Loops over a single 8x8 MCU and draws it on Tkinter canvas
     """
- 
+
     f = open("matrix_code.txt", "a")
     for yy in range(8):
         for xx in range(8):
@@ -61,9 +60,10 @@ def DrawMatrix(x, y, matL, matCb, matCr):
             )
             x1, y1 = (x * 8 + xx) * 2, (y * 8 + yy) * 2
             x2, y2 = (x * 8 + (xx + 1)) * 2, (y * 8 + (yy + 1)) * 2
-            f.write("{},{},{},{},{},{}".format(x1,y1,x2,y2,c,"\n"))
-            w.create_rectangle(x1, y1, x2, y2, fill=c, outline=c)
+            f.write("{},{},{},{},{},{}".format(x1, y1, x2, y2, c, "\n"))
+            # w.create_rectangle(x1, y1, x2, y2, fill=c, outline=c)
     f.close()
+
 
 def RemoveFF00(data):
     """
@@ -299,7 +299,7 @@ class JPEG:
 
     def BaselineDCT(self, data):
         hdr, self.height, self.width, components = unpack(">BHHB", data[0:6])
-        print("size %ix%i" % (self.width,  self.height))
+        print("size %ix%i" % (self.width, self.height))
 
         for i in range(components):
             id, samp, QtbId = unpack("BBB", data[6 + i * 3 : 9 + i * 3])
@@ -358,15 +358,10 @@ class JPEG:
 
 
 if __name__ == "__main__":
-    from tkinter import Tk, Canvas, mainloop
+
     os.remove("matrix_code.txt")
-    master = Tk()
-    w = Canvas(master, width=1600, height=600)
-    w.pack()
-    # print(JPEG("profile.jpg"))
+
     img = JPEG("profile.jpg")
     img.decode()
-    image = decodeMatrix(800,800)
+    image = decodeMatrix(800, 800)
     print(image)
-    # mainloop()
-    # main()
