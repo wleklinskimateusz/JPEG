@@ -3,7 +3,10 @@ import sys
 from struct import unpack
 import math
 import os
+
+from matplotlib import pyplot as plt
 from read_matrix_code import *
+from gui import Window, QApplication
 
 marker_mapping = {
     0xFFD8: "Start of Image",
@@ -191,7 +194,14 @@ class HuffmanTable:
     def Find(self, st):
         r = self.root
         while isinstance(r, list):
-            r = r[st.GetBit()]
+            b = st.GetBit()
+            if not b:
+                r = r[0]
+                continue
+            if b >= len(r):
+                r = r[0]
+            else:
+                r = r[b]
         return r
 
     def GetCode(self, st):
@@ -205,7 +215,7 @@ class HuffmanTable:
 
 class Stream:
     """
-    A bit stream class with convenience methods
+    A bit stream class with convenient methods
     """
 
     def __init__(self, data):
@@ -213,7 +223,11 @@ class Stream:
         self.pos = 0
 
     def GetBit(self):
-        b = self.data[self.pos >> 3]
+        try:
+            b = self.data[self.pos >> 3]
+            print(b)
+        except IndexError:
+            return
         s = 7 - (self.pos & 0x7)
         self.pos += 1
         return (b >> s) & 1
@@ -221,11 +235,17 @@ class Stream:
     def GetBitN(self, l):
         val = 0
         for _ in range(l):
-            val = val * 2 + self.GetBit()
+            b = self.GetBit()
+            if not b:
+                return val
+            val = val * 2 + b
         return val
 
-    def len(self):
+    def __len__(self):
         return len(self.data)
+
+    def len(self):
+        return self.__len__()
 
 
 class JPEG:
@@ -359,9 +379,9 @@ class JPEG:
 
 if __name__ == "__main__":
 
-    os.remove("matrix_code.txt")
-
-    img = JPEG("profile.jpg")
+    # main()
+    img = JPEG("myjpg.jpg")
     img.decode()
-    image = decodeMatrix(800, 800)
-    print(image)
+    image = decodeMatrix(800, 600)
+    plt.imshow(image)
+    plt.show()
