@@ -3,6 +3,8 @@ import numpy as np
 from skimage import img_as_float, io
 from scipy import fft
 
+from zigzag import get_zigzag_row_col
+
 quantization = np.array(
     [
         [
@@ -17,10 +19,6 @@ quantization = np.array(
         ]
     ]
 )
-
-
-def get_idx(row, col):
-    return row * 8 + col
 
 
 def ycbcr(image):
@@ -111,9 +109,6 @@ class JPEGencoder:
     def __init__(self, matrix: np.ndarray) -> None:
         self.pixels = matrix
         self.splitted_pixels = []
-        self.color1 = None
-        self.color2 = None
-        self.color3 = None
         self.blocks = None
 
     def split_pixels(self) -> None:
@@ -139,29 +134,21 @@ class JPEGencoder:
                     self.splitted_pixels[i][:, :, c] / quantization
                 )
 
-    def zigzag_transform(self, block):
-        zigzag_block = np.zeros((8, 8, 3))
-        for i in range(8):
-            for j in range(8):
-                zigzag_block[i, j] = block[i, j]
-        for i in range(8):
-            for j in range(8):
-                if i % 2 == 0:
-                    if j % 2 == 0:
-                        zigzag_block[i, j] = block[i, j]
-                    else:
-                        zigzag_block[i, j] = block[7 - j, i]
-                else:
-                    if j % 2 == 0:
-                        zigzag_block[i, j] = block[7 - i, j]
-                    else:
-                        zigzag_block[i, j] = block[j, 7 - i]
-        return zigzag_block
+    def zigzag_block(self, block):
+        """
+        Apply ZigZag Scan on a block
+        """
+        output = []
+        for c in range(3):
+            for i in range(len(block) ** 2):
+                row, col = get_zigzag_row_col(i)
+                output.append(block[row, col, c])
+
+        return output
 
     def zigzag(self):
-        output = []
         for i in range(len(self.splitted_pixels)):
-            output.append(self.zigzag_transform(self.splitted_pixels[i]))
+            self.splitted_pixels[i] = self.zigzag_block(self.splitted_pixels[i])
 
     def dcpm(self):
         """
@@ -173,13 +160,15 @@ class JPEGencoder:
                 output.append(self.splitted_pixels[i])
                 continue
             output.append(self.splitted_pixels[i] - self.splitted_pixels[i - 1])
+        self.splitted_pixels = output
 
     def run(self):
         self.split_pixels()
         self.color_space_transform()
         self.apply_dct()
         self.quantization_transform()
-        # self.zigzag()
+        self.zigzag()
+        # self.dcpm()
 
 
 class JPEGDecoder:
@@ -209,14 +198,25 @@ class JPEGDecoder:
                     blocks * i + j
                 ]
 
-    # def unzigzag_transform(self, block):
+    def unzigzag_block(self, block):
+        """
+        Apply ZigZag Scan on a block
+        """
+        output = np.zeros((8, 8, 3))
+        a = len(block) // 3
+        for c in range(3):
+            for i in range(a):
+                row, col = get_zigzag_row_col(i)
+                output[row, col, c] = block[i + c * a]
+
+        return output
 
     def unzigzag(self):
-        output = []
         for i in range(len(self.segments)):
-            output.append(self.unzigzag_transform(self.segments[i]))
+            self.segments[i] = self.unzigzag_block(self.segments[i])
 
     def run(self):
+        self.unzigzag()
         self.unquantization_transform()
         self.apply_idct()
         self.color_space_transform()
