@@ -144,7 +144,7 @@ class JPEGencoder:
                 row, col = get_zigzag_row_col(i)
                 output.append(block[row, col, c])
 
-        return output
+        return np.array(output)
 
     def zigzag(self):
         for i in range(len(self.splitted_pixels)):
@@ -154,13 +154,12 @@ class JPEGencoder:
         """
         Apply Differential Pulse Code Modulation on a block
         """
-        output = []
         for i in range(len(self.splitted_pixels)):
-            if i == 0:
-                output.append(self.splitted_pixels[i])
-                continue
-            output.append(self.splitted_pixels[i] - self.splitted_pixels[i - 1])
-        self.splitted_pixels = output
+            output = np.zeros(len(self.splitted_pixels[i]))
+            output[0] = self.splitted_pixels[i][0]
+            for j in range(1, len(self.splitted_pixels[i])):
+                output[j] = self.splitted_pixels[i][j] - self.splitted_pixels[i][j - 1]
+            self.splitted_pixels[i] = output
 
     def run(self):
         self.split_pixels()
@@ -168,7 +167,7 @@ class JPEGencoder:
         self.apply_dct()
         self.quantization_transform()
         self.zigzag()
-        # self.dcpm()
+        self.dcpm()
 
 
 class JPEGDecoder:
@@ -215,7 +214,16 @@ class JPEGDecoder:
         for i in range(len(self.segments)):
             self.segments[i] = self.unzigzag_block(self.segments[i])
 
+    def undcpm(self):
+        """
+        Apply Differential Pulse Code Modulation on a block
+        """
+        for i in range(len(self.segments)):
+            for j in range(1, len(self.segments[i])):
+                self.segments[i][j] = self.segments[i][j] + self.segments[i][j - 1]
+
     def run(self):
+        self.undcpm()
         self.unzigzag()
         self.unquantization_transform()
         self.apply_idct()
