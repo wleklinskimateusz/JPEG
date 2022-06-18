@@ -10,7 +10,7 @@ class Window(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("JPEG GUI")
-        self.setGeometry(100, 100, 800, 600)
+        self.setGeometry(64, 64, 512, 512)
 
         # Image
         self.image = QImage(self.size(), QImage.Format_RGB32)
