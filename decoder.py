@@ -13,7 +13,7 @@ class Decoder:
     def unquantization_transform(self) -> None:
         for i in range(len(self.segments)):
             for c in range(3):
-                self.segments[i][:, :, c] = self.segments[i][:, :, c] * quantization
+                self.segments[i][:, :, c] = self.segments[i][:, :, c] / quantization
 
     def apply_idct(self) -> None:
         for i in range(len(self.segments)):

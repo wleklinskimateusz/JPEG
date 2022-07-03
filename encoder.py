@@ -31,8 +31,8 @@ class Encoder:
         for i in range(len(self.splitted_pixels)):
             for c in range(3):
                 self.splitted_pixels[i][:, :, c] = (
-                    self.splitted_pixels[i][:, :, c] / quantization
-                )
+                    self.splitted_pixels[i][:, :, c] * quantization
+                ).astype(int)
 
     def zigzag_block(self, block):
         """
@@ -44,7 +44,7 @@ class Encoder:
                 row, col = get_zigzag_row_col(i)
                 output.append(block[row, col, c])
 
-        return np.array(output)
+        return np.array(output, dtype=int)
 
     def zigzag(self):
         for i in range(len(self.splitted_pixels)):
@@ -55,7 +55,7 @@ class Encoder:
         Apply Differential Pulse Code Modulation on a block
         """
         for i in range(len(self.splitted_pixels)):
-            output = np.zeros(len(self.splitted_pixels[i]))
+            output = np.zeros(len(self.splitted_pixels[i]), dtype=int)
             output[0] = self.splitted_pixels[i][0]
             for j in range(1, len(self.splitted_pixels[i])):
                 output[j] = self.splitted_pixels[i][j] - self.splitted_pixels[i][j - 1]
@@ -68,3 +68,5 @@ class Encoder:
         self.quantization_transform()
         self.zigzag()
         self.dcpm()
+        print(self.splitted_pixels[50])
+        # print(len(self.splitted_pixels))
