@@ -3,19 +3,28 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import numpy as np
 
-from jpeg_handler import JPEG
+from encoder import Encoder
+from decoder import Decoder
 
 
 class Window(QMainWindow):
+    """
+    Main Window For GUI
+    """
+
     def __init__(self):
+        """
+        The constructor for the main window.
+        """
         super().__init__()
-        self.setWindowTitle("JPEG GUI")
-        self.setGeometry(64, 64, 512, 512)
+        self.setWindowTitle("JPEG GUI")  # Set the title of the window.
+        self.setGeometry(64, 64, 512, 512)  # Set the size and position of the window.
 
         # Image
-        self.image = QImage(self.size(), QImage.Format_RGB32)
-        self.image.fill(Qt.white)
+        self.image = QImage(self.size(), QImage.Format_RGB32)  # Create the image.
+        self.image.fill(Qt.white)  # Fill the image with white.
 
+        # Initialize the brush size and color.
         self.drawing = False
         self.brushSize = 2
         self.brushColor = Qt.black
@@ -23,6 +32,7 @@ class Window(QMainWindow):
         # QPoint object to tract the point
         self.lastPoint = QPoint()
 
+        # Create the menu bar.
         mainMenu = self.menuBar()
 
         fileMenu = mainMenu.addMenu("File")
@@ -58,6 +68,14 @@ class Window(QMainWindow):
             self.save_menu_action(color["name"], color["color"], b_color)
 
     def save_menu_action(self, name: str, command, menu: QMenu):
+        """
+        Creates a menu action and adds it to the menu.
+        params:
+            name: The name of the menu action.
+            command: The command to execute when the menu action is clicked.
+            menu: The menu to add the menu action to.
+
+        """
         action = QAction(name, self)
         action.triggered.connect(command)
         menu.addAction(action)
@@ -88,11 +106,17 @@ class Window(QMainWindow):
         return matrix
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
+        """
+        handles the mouse press event.
+        """
         if event.button() == Qt.LeftButton:
             self.drawing = True
             self.lastPoint = event.pos()
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:
+        """
+        handles the mouse move event.
+        """
         if (event.buttons() & Qt.LeftButton) & self.drawing:
             painter = QPainter(self.image)
             painter.setPen(
@@ -109,37 +133,57 @@ class Window(QMainWindow):
             self.update()
 
     def mouseReleaseEvent(self, event: QMouseEvent) -> None:
+        """
+        Handles the mouse release event.
+        """
         if event.button() == Qt.LeftButton:
             self.drawing = False
 
     def paintEvent(self, event):
+        """
+        Handles the paint event.
+        """
+
         canvasPainter = QPainter(self)
         canvasPainter.drawImage(self.rect(), self.image, self.image.rect())
 
     def save(self):
+        """
+        saves the image to a .npy file.
+        """
+
         filePath, _ = QFileDialog.getSaveFileName(
-            self, "Save Image", "", "JPEG(*.jpg *.jpeg)"
+            self, "Save Image", "", "Images (*.npy)"
         )
 
         if filePath == "":
             return
-        jpeg = JPEG()
-        jpeg.save(self.save_image_to_matrix(), filePath)
+        jpeg = Encoder(self.save_image_to_matrix(), filePath)
+        jpeg.run()
 
     def clear(self):
+        """
+        Clears the image.
+        """
 
         self.image.fill(Qt.white)
         self.update()
 
     def load(self):
+        """
+        Loads an image from a .npy file.
+        """
         filePath, _ = QFileDialog.getOpenFileName(
-            self, "Load Image", "", "JPEG(*.jpg *.jpeg)"
+            self, "Load Image", "", "Image Files (*.npy)"
         )
 
         if filePath == "":
             return
-        jpeg = JPEG()
-        self.load_image_from_matrix(jpeg.load(filePath))
+        decoder = Decoder(filePath)
+        decoder.run()
+        self.load_image_from_matrix(decoder.image.astype(int))
+
+        # Helper Functions to set the brush size and color.
 
     def Pixel_4(self):
         self.brushSize = 4
